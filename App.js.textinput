@@ -1,0 +1,408 @@
+//returnKeyType='next'?
+//fix containers and styles (-Values-)
+//fix display data
+//fix refs functions {}
+//apolipoproteiner
+
+import React from 'react'
+import { ScrollView, KeyboardAvoidingView, Keyboard, Alert, AsyncStorage, TouchableOpacity,
+TextInput, StyleSheet, Text, View } from 'react-native';
+
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state= {
+      //id: "",
+      date: "",
+      kolesterol: "",
+      LDL_kolesterol: "",
+      HDL_kolesterol: "",
+      triglycerider: "",
+      apolipoproteiner: "",
+      bloodpressure: "",
+      HbA1c_bloodsugar: "",
+      waist: "",
+      //nextKey: "",
+    }
+
+    this.focusNextField = this.focusNextField.bind(this); 
+    this.inputs = {};
+
+  }
+
+  focusNextField(field) {
+    this.inputs[field].focus();  
+  }
+
+  componentDidMount() {
+    console.log("Component Did Mount");
+    this._initialState().done();
+  }
+
+  componentDidUpdate() {
+    console.log("Component Did Update");
+  }
+
+  _initialState = async() =>{
+    try {
+      const nextKey = await AsyncStorage.getItem('nextKey');
+      //AsyncStorage.multiRemove(keys);
+      console.log("nextKey from initialState: ", nextKey)
+      if (!nextKey) {
+        console.log("Initial keys empty");
+        this._saveNextKey(0);
+      }
+    }
+    catch(error) {
+      console.log("initialState: ", error);  
+    }  
+  }
+
+  _saveInputs = async(key, value) => {
+    try {
+      //const key = this.state.nextKey;
+      await AsyncStorage.setItem(key, JSON.stringify(value));
+    }
+    catch(error) {
+      alert(error);  
+    }  
+  }
+
+  _saveNextKey = async(nextKey) => {
+    try {
+      console.log("next key ::::", nextKey);
+      await AsyncStorage.setItem('nextKey', JSON.stringify(nextKey));  
+    }
+    catch(error) {
+      console.log("saveNextKey error: ", error);  
+    }
+  }
+
+  _getNextKey = async() => {
+    try {
+      const nextKey = await AsyncStorage.getItem('nextKey'); 
+      console.log("getNextKey: ", nextKey);
+      return nextKey
+    }
+    catch(error) {
+      console.log("getNextKey error: ", error);  
+    }
+  }
+
+  _submit = () => {
+    console.log(
+        this.state.date,
+        this.state.kolesterol,
+        this.state.LDL_kolesterol,
+        this.state.HDL_kolesterol,
+        this.state.triglycerider,
+        this.state.apolipoproteiner,
+        this.state.bloodpressure,
+        this.state.HbA1c_bloodsugar,
+        this.state.waist,
+       )
+
+    //if (!this.state.id && !this.state.key) {
+      //Alert.alert("Id and keys empty");
+    //}
+
+    this._getNextKey().then(
+    nextKey => {
+      console.log("key from getNextKey: ", nextKey);
+      console.log("key: ", key);
+    })
+    const key = this.nextKey;
+    const id = this.nextKey;
+
+    let inputs = {
+      id: id,
+      date: this.state.date,
+      kolesterol: this.state.kolesterol ,
+      LDL_kolesterol: this.state.LDL_kolesterol,
+      HDL_kolesterol: this.state.HDL_kolesterol,
+      triglycerider: this.state.triglycerider,
+      apolipoproteiner: this.state.apolipoproteiner,
+      bloodpressure: this.state.bloodpressure,
+      HbA1c_bloodsugar: this.state.HbA1c_bloodsugar,
+      waist: this.state.waist,
+    };
+
+    console.log("inputs:", inputs);
+    console.log("inputs:", JSON.stringify(inputs));
+
+    //this._saveInputs(nextKey, inputs);
+
+    this.setState({
+      //id: this.state.id += 1,
+      date: "",
+      kolesterol: "",
+      LDL_kolesterol: "",
+      HDL_kolesterol: "",
+      triglycerider: "",
+      apolipoproteiner: "",
+      bloodpressure: "",
+      HbA1c_bloodsugar: "",
+      waist: "",
+      //nextKey: this.state.key += 1,
+    });
+
+    const nextKey = this.key + 1;
+    this._saveNextKey(nextKey);
+  }
+
+  _displayData = async() => {
+    try {
+      //this.setState({id: this.state.id = 0});
+      const keys = await AsyncStorage.getAllKeys();
+      //const values = await AsyncStorage.getItem(keys)
+      //let items = await AsyncStorage.multiGet(keys)
+      //let data = await AsyncStorage.getItem('this.state.id');
+      console.log('Keys currently stored in AsyncStorage:', keys);  
+      //console.log('Values currently stored in AsyncStorage:', values);  
+      //this.setState({id: this.state.id += 1});
+    }
+
+    catch(error) {
+      alert(error);  
+    }
+  }
+
+  _removeData = async() => {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      if (keys.length === 0) {
+        console.log("Keys to remove empty");  
+      }
+      console.log("Keys to remove: ", keys);
+      await AsyncStorage.multiRemove(keys);
+    }
+    catch(error) {
+      alert(error);
+    } 
+  }
+
+  render() {
+    return(
+      <KeyboardAvoidingView behavior='padding' style={styles.wrapper}>
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+
+          <Text style={styles.header}>-Input values-</Text>
+          <Text style = {{fontSize: 16, fontWeight: 'bold', color: '#fff',
+            marginBottom: 30}}>
+            Swipe up to see all inputfields
+          </Text>
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='yyyymmdd'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.date}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('kolesterol')}
+            onChangeText={
+              (date) => this.setState({date})}
+            ref={
+             (input) => this.inputs['yyyymmdd'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='kolesterol'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.kolesterol}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('LDL-kolesterol')}
+            onChangeText={
+              (kolesterol) => this.setState({kolesterol})}
+            ref={
+              (input) => this.inputs['kolesterol'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='LDL-kolesterol'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.LDL_kolesterol}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('HDL-kolesterol')}
+            onChangeText={
+              (LDL_kolesterol) => this.setState({LDL_kolesterol})}
+            ref={
+              (input) => this.inputs['LDL-kolesterol'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='HDL-kolesterol'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.HDL_kolesterol}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('triglycerider')}
+            onChangeText={
+              (HDL_kolesterol) => this.setState({HDL_kolesterol})}
+            ref={
+              (input) => this.inputs['HDL-kolesterol'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='triglycerider'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.triglycerider}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('apolipoproteiner')}
+            onChangeText={
+              (triglycerider) => this.setState({triglycerider})}
+            ref={
+              (input) => this.inputs['triglycerider'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='apolipoproteiner'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.apolipoproteiner}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('bloodpressure')}
+            onChangeText={
+              (apolipoproteiner) => this.setState({apolipoproteiner})}
+            ref={
+              (input) => this.inputs['apolipoproteiner'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='bloodpressure'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.bloodpressure}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('HbA1c-bloodsugar')}
+            onChangeText={
+              (bloodpressure) => this.setState({bloodpressure})}
+            ref={
+              (input) => this.inputs['bloodpressure'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='HbA1c-bloodsugar'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.HbA1c_bloodsugar}
+            //onEndEditing={this._submit}
+            returnKeyType='next'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ false }
+            onSubmitEditing={
+              () => this.focusNextField('waist')}
+            onChangeText={
+              (HbA1c_bloodsugar) => this.setState({HbA1c_bloodsugar})}
+            ref={
+              (input) => this.inputs['HbA1c-bloodsugar'] = input}
+          />
+
+          <TextInput
+            style={styles.textInput}
+            placeholder='waist'
+            placeholderTextColor='#2f2f2f'
+            value={this.state.waist}
+            //onEndEditing={this._submit}
+            returnKeyType='done'
+            underlineColorAndroid='transparent'
+            blurOnSubmit={ true }
+            onChangeText={
+              (waist) => this.setState({waist})}
+            ref={
+              (input) => this.inputs['waist'] = input}
+          />
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={this._submit}>
+            <Text>Submit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={this._displayData}>
+            <Text>Display stored data</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={this._removeData}>
+            <Text>Remove stored data</Text>
+          </TouchableOpacity>
+          
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,  
+  },
+  contentContainer: {
+    //flex: 1,
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2896d3',
+    //paddingLeft: 40,
+    //paddingRight: 40,    
+  },
+  header: {
+    fontSize: 24,
+    marginBottom: 10,
+    color: '#fdfdfd',
+    fontWeight: 'bold',    
+  },
+  textInput: {
+    flex: 1,
+    //alignSelf: 'stretch',
+    padding: 10,
+    marginBottom: 20,
+    backgroundColor: '#fdfdfd',
+    width: 200,
+    borderRadius: 10,
+  },
+  btn: {
+    flex: 1,
+    //alignSelf: 'stretch',
+    backgroundColor: '#01c853',  
+    padding: 10,
+    alignItems: 'center',
+    marginBottom: 30,
+    width: 200,
+    borderRadius: 10,
+  },
+});

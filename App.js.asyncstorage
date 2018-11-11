@@ -1,0 +1,141 @@
+import React from 'react';
+import {
+   StyleSheet,
+   Text,
+   View,
+   TouchableOpacity,
+   AsyncStorage,
+} from 'react-native';
+
+export default class App extends React.Component {
+  render() {
+    return (
+      <View style={styles.container}>
+        <TouchableOpacity onPress={this.saveData}>
+          <Text style={{padding: 10}}>Click to save data</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={this.displayData}>
+          <Text style={{padding: 10}}>Click to display data</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={this.removeData}>
+          <Text style={{padding: 10}}>Click to remove data</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  saveData() {
+    let obj1 = {
+        name: 'John Doe',
+        age: 30,
+        city: 'Are'  
+    }
+    let obj2 = {
+        name: 'Lars Doe',
+        age: 50,
+        city: 'Kalix'  
+    }
+
+    console.log("obj1", obj1);
+    console.log("stringify: ", JSON.stringify(obj1));
+    console.log("parsed: ", JSON.parse(JSON.stringify(obj1)));
+
+    //let key1 = 'user1';
+    //let key2 = 'user2';
+
+    const set_pairs = [['user1', JSON.stringify(obj1)], ['user2', JSON.stringify(obj2)]];
+
+    //AsyncStorage.setItem(key1, JSON.stringify(obj1));
+    //AsyncStorage.setItem(key2, JSON.stringify(obj2));
+    AsyncStorage.multiSet(set_pairs);
+    alert("Data Saved");
+  }
+
+  /*
+  displayData = async () => {
+    try {
+        const keys = await AsyncStorage.getAllKeys()
+        const items = await AsyncStorage.multiGet(keys)
+
+        return items
+    } catch (error) {
+        console.log(error, "problemo")
+    }
+  }
+  */
+
+  displayData = async () => {
+    try {
+        const keys = await AsyncStorage.getAllKeys()
+        if (keys.length<1) {
+          console.log("keys empty");
+        }
+        console.log("keys: ", keys);
+        //const items = await AsyncStorage.multiGet(keys);
+        const items = await AsyncStorage.multiGet((keys), (error, stores) => {
+        console.log("items: ", items);
+        stores.map((result, i, store) => {
+          console.log("stores: ", stores);
+          console.log("result", result);
+          console.log("i",i);
+          console.log("store", store);
+          let key = store[i][0];
+          console.log("key: ", key);
+          let value = JSON.parse(store[i][1]);
+          console.log("value: ", value);  
+        });
+        });
+        console.log("items: ", items);
+        //const items = await AsyncStorage.multiGet(['user1', 'user2']);
+        //let user1 = await AsyncStorage.getItem('user1');
+        //let user2 = await AsyncStorage.getItem('user2');
+        //let parsed1 = JSON.parse(items[0]);
+        //console.log(parsed1);
+        //let parsed2 = JSON.parse(user2);
+        const parsable = items[0][1];
+        console.log("items[0][1]: ", items[0][1]);
+        const parsed = JSON.parse(parsable)
+        console.log("parsed: ", parsed);
+        //items.map(req => JSON.parse(req)).forEach(console.log)
+        //let parsed = items.json();
+        //console.log(typeof user);
+        //console.log(typeof parsed);
+        //console.log(user1.slice(10));
+        //console.log(parsed);
+        //console.log(parsed[0].name);
+        //alert(parsed[1].name);
+        //alert(parsed1.name + " " + parsed2.name);
+        //alert(parsed.name);
+        //return items
+    }
+
+    catch(error) {
+      alert(error);  
+    }
+  }
+
+
+  removeData = async () => {
+    const keys = await AsyncStorage.getAllKeys()
+    try {
+        AsyncStorage.multiRemove(keys);
+    }
+
+    catch(error) {
+      alert(error);  
+    }
+
+  }
+
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
