@@ -12,7 +12,8 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state= {
-      //id: "",
+      key: null,
+      id: null,
       date: "",
       kolesterol: "",
       LDL_kolesterol: "",
@@ -22,7 +23,6 @@ export default class App extends React.Component {
       bloodpressure: "",
       HbA1c_bloodsugar: "",
       waist: "",
-      //nextKey: "",
     }
 
     this.focusNextField = this.focusNextField.bind(this); 
@@ -46,120 +46,114 @@ export default class App extends React.Component {
   _initialState = async() =>{
     try {
       const nextKey = await AsyncStorage.getItem('nextKey');
-      //AsyncStorage.multiRemove(keys);
-      console.log("nextKey from initialState: ", nextKey)
       if (!nextKey) {
-        console.log("Initial keys empty");
-        this._saveNextKey(0);
+        await AsyncStorage.setItem('nextKey', JSON.stringify(0))
+        .then(() =>  
+          this.setState ({
+            id: 0,
+            key: 0,
+          }));
+      console.log("key and id set to: ", this.state.key, this.state.id);
       }
     }
     catch(error) {
-      console.log("initialState: ", error);  
+      console.log("error _initialState: ", error);  
     }  
   }
 
   _saveInputs = async(key, value) => {
     try {
-      //const key = this.state.nextKey;
-      await AsyncStorage.setItem(key, JSON.stringify(value));
+      await AsyncStorage.setItem(key, value);
     }
     catch(error) {
-      alert(error);  
+      console.log("error _saveInputs: ", error);  
     }  
   }
 
   _saveNextKey = async(nextKey) => {
     try {
-      console.log("next key ::::", nextKey);
       await AsyncStorage.setItem('nextKey', JSON.stringify(nextKey));  
     }
     catch(error) {
-      console.log("saveNextKey error: ", error);  
+      console.log("error _saveNextKey: ", error);  
     }
   }
 
   _getNextKey = async() => {
     try {
-      const nextKey = await AsyncStorage.getItem('nextKey'); 
-      console.log("getNextKey: ", nextKey);
-      return nextKey
+      const key = await AsyncStorage.getItem('nextKey')
+      .then((key) =>
+      this.setState({'key': JSON.parse(key), 'id': JSON.parse(key)})) 
     }
     catch(error) {
-      console.log("getNextKey error: ", error);  
+      console.log("error _getNextKey: ", error);  
     }
   }
 
-  _submit = () => {
-    console.log(
-        this.state.date,
-        this.state.kolesterol,
-        this.state.LDL_kolesterol,
-        this.state.HDL_kolesterol,
-        this.state.triglycerider,
-        this.state.apolipoproteiner,
-        this.state.bloodpressure,
-        this.state.HbA1c_bloodsugar,
-        this.state.waist,
-       )
+  _submit = async() => {
+    try {
 
-    //if (!this.state.id && !this.state.key) {
-      //Alert.alert("Id and keys empty");
-    //}
+      await this._getNextKey()
+      console.log("1 this.state.key, id: ", this.state.key, this.state.id);
 
-    this._getNextKey().then(
-    nextKey => {
-      console.log("key from getNextKey: ", nextKey);
-      console.log("key: ", key);
-    })
-    const key = this.nextKey;
-    const id = this.nextKey;
+      const inputs = {
+        id: this.state.id,
+        date: this.state.date,
+        kolesterol: this.state.kolesterol ,
+        LDL_kolesterol: this.state.LDL_kolesterol,
+        HDL_kolesterol: this.state.HDL_kolesterol,
+        triglycerider: this.state.triglycerider,
+        apolipoproteiner: this.state.apolipoproteiner,
+        bloodpressure: this.state.bloodpressure,
+        HbA1c_bloodsugar: this.state.HbA1c_bloodsugar,
+        waist: this.state.waist,
+      };
+        console.log("2 inputs: ", inputs);
+        console.log("3 key and id: ", this.state.key, this.state.id);
 
-    let inputs = {
-      id: id,
-      date: this.state.date,
-      kolesterol: this.state.kolesterol ,
-      LDL_kolesterol: this.state.LDL_kolesterol,
-      HDL_kolesterol: this.state.HDL_kolesterol,
-      triglycerider: this.state.triglycerider,
-      apolipoproteiner: this.state.apolipoproteiner,
-      bloodpressure: this.state.bloodpressure,
-      HbA1c_bloodsugar: this.state.HbA1c_bloodsugar,
-      waist: this.state.waist,
-    };
+      await this._saveInputs(this.state.key.toString(), JSON.stringify(inputs));
 
-    console.log("inputs:", inputs);
-    console.log("inputs:", JSON.stringify(inputs));
-
-    //this._saveInputs(nextKey, inputs);
-
-    this.setState({
-      //id: this.state.id += 1,
-      date: "",
-      kolesterol: "",
-      LDL_kolesterol: "",
-      HDL_kolesterol: "",
-      triglycerider: "",
-      apolipoproteiner: "",
-      bloodpressure: "",
-      HbA1c_bloodsugar: "",
-      waist: "",
-      //nextKey: this.state.key += 1,
-    });
-
-    const nextKey = this.key + 1;
-    this._saveNextKey(nextKey);
+      const nextKey = (this.state.key += 1);
+      console.log("4 nextKey: ", nextKey);
+      await this._saveNextKey(nextKey)
+      .then(() =>
+        this.setState({
+          key: null,
+          id: null,
+          date: "",
+          kolesterol: "",
+          LDL_kolesterol: "",
+          HDL_kolesterol: "",
+          triglycerider: "",
+          apolipoproteiner: "",
+          bloodpressure: "",
+          HbA1c_bloodsugar: "",
+          waist: "",
+        }));
+      console.log("5 key and id: ", this.state.key, this.state.id);
+    } catch(error) {
+        console.log("error _submit: ", error);  
+    }
   }
 
   _displayData = async() => {
     try {
-      //this.setState({id: this.state.id = 0});
-      const keys = await AsyncStorage.getAllKeys();
-      //const values = await AsyncStorage.getItem(keys)
-      //let items = await AsyncStorage.multiGet(keys)
-      //let data = await AsyncStorage.getItem('this.state.id');
-      console.log('Keys currently stored in AsyncStorage:', keys);  
-      //console.log('Values currently stored in AsyncStorage:', values);  
-      //this.setState({id: this.state.id += 1});
+        const keys = await AsyncStorage.getAllKeys()
+        if (keys.length<1) {
+          console.log("keys empty");
+        }
+        const items = await AsyncStorage.multiGet((keys), (error, stores) => {
+        stores.map((result, i, store) => {
+          //console.log("stores: ", stores);
+          //console.log("result", result);
+          //console.log("i",i);
+          //console.log("store", store);
+          let key = store[i][0];
+          console.log("key: ", key);
+          let value = JSON.parse(store[i][1]);
+          console.log("value: ", value);  
+        });
+        });
     }
 
     catch(error) {

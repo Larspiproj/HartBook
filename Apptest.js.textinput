@@ -1,0 +1,44 @@
+  _submit = async() => {
+    try {
+      const currentKey = await AsyncStorage.getItem('nextKey'); 
+      const key = id = JSON.parse(currentKey);
+      this.setState({
+        key: key,
+        id: id,  
+      });
+      const inputs = {
+        id: this.state.id,
+        date: this.state.date,
+        kolesterol: this.state.kolesterol ,
+        LDL_kolesterol: this.state.LDL_kolesterol,
+        HDL_kolesterol: this.state.HDL_kolesterol,
+        triglycerider: this.state.triglycerider,
+        apolipoproteiner: this.state.apolipoproteiner,
+        bloodpressure: this.state.bloodpressure,
+        HbA1c_bloodsugar: this.state.HbA1c_bloodsugar,
+        waist: this.state.waist,
+      };
+
+      await AsyncStorage.setItem(this.state.key.toString(), JSON.stringify(inputs));
+      const nextKey = (this.state.key += 1);
+      await AsyncStorage.setItem('nextKey', JSON.stringify(nextKey));  
+
+    this.setState({
+      //id: this.state.id += 1,
+      id: null,
+      date: "",
+      kolesterol: "",
+      LDL_kolesterol: "",
+      HDL_kolesterol: "",
+      triglycerider: "",
+      apolipoproteiner: "",
+      bloodpressure: "",
+      HbA1c_bloodsugar: "",
+      waist: "",
+      key: null,
+    });
+
+    } catch(error) {
+      console.log("Error from submit: ", error);  
+    }  
+  }
