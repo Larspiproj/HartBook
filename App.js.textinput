@@ -142,6 +142,7 @@ export default class App extends React.Component {
         if (keys.length<1) {
           console.log("keys empty");
         }
+        const values = [];
         const items = await AsyncStorage.multiGet((keys), (error, stores) => {
         stores.map((result, i, store) => {
           //console.log("stores: ", stores);
@@ -149,11 +150,14 @@ export default class App extends React.Component {
           //console.log("i",i);
           //console.log("store", store);
           let key = store[i][0];
-          console.log("key: ", key);
+          //console.log("key: ", key);
           let value = JSON.parse(store[i][1]);
-          console.log("value: ", value);  
+          values.push(value);
+          console.log("values: ", values);
+          //console.log("value: ", value);  
         });
         });
+        console.log("values[5]: ", values[5].kolesterol);
     }
 
     catch(error) {
